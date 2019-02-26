@@ -4,7 +4,6 @@
 #include "GameFramework/Actor.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
-#include "Public/PatrollingGuard.h"
 #include "Public/PatrolRouteComponent.h"
 EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
@@ -18,18 +17,19 @@ EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent & Ow
 	auto ControlledPawn = AIControl->GetPawn();
 	if (!ControlledPawn)
 	{
-		return EBTNodeResult::Aborted;
+		return EBTNodeResult::Failed;
 	}
 	//TODO remove coupling
-	auto PatrollingGuard = Cast<APatrollingGuard>(ControlledPawn);
-	PatrollingGuard->FindComponentByClass<UPatrolRouteComponent>();
+	UPatrolRouteComponent *PatrolRtComp = ControlledPawn->FindComponentByClass<UPatrolRouteComponent>();
+	if (!PatrolRtComp)
+	{
+		return EBTNodeResult::Failed;
+	}
+	PatrolPoints = PatrolRtComp->GetPatrolPoints();
 	BlackboardComp = OwnerComp.GetBlackboardComponent();
-	// SetPatrolPoints
-	//PatrolPoints = PatrollingGuard->GetNextWaypoint();
-	PatrolPoints = PatrollingGuard->GetNextWaypoint();
 	if (!BlackboardComp)
 	{
-		return EBTNodeResult::Aborted;
+		return EBTNodeResult::Failed;
 	}
 
 //	auto Index = BlackboardComp->GetValueAsInt(FName("NextWaypointIndex"));
@@ -37,13 +37,9 @@ EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent & Ow
 	int32 CurrentIndex = SetNextWayPoint(Index);
 	CycleWaypointIndex(CurrentIndex);
 	//UE_LOG(LogTemp, Warning, TEXT("Waypoint index: %i."), Index);
-//	UE_LOG(LogTemp, Warning, TEXT("next waypoint: %s."), NextWayPoint);
-	
 
 	return EBTNodeResult::Succeeded;
 }
-
-
 
 void UChooseNextWaypoint::SetPatrolPoints(TArray<AActor*> PatrolPts)
 {
