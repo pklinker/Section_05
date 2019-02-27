@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "PatrolRouteComponent.generated.h"
 
+/**
+* A "route card" to help the AI choose their next waypoint.
+*/
 class AActor;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
