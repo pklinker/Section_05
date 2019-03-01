@@ -7,13 +7,15 @@
 #include "Public/PatrolRouteComponent.h"
 EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Executing AI Task."));
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	
 	// get the patrol points
 	AAIController* AIControl = OwnerComp.GetAIOwner();
 	if (!AIControl) {
-		return EBTNodeResult::Aborted;
+		return EBTNodeResult::Failed;
 	}
+	
 	auto ControlledPawn = AIControl->GetPawn();
 	if (!ControlledPawn)
 	{
@@ -26,18 +28,20 @@ EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent & Ow
 		return EBTNodeResult::Failed;
 	}
 	PatrolPoints = PatrolRtComp->GetPatrolPoints();
+
 	BlackboardComp = OwnerComp.GetBlackboardComponent();
 	if (!BlackboardComp)
 	{
 		return EBTNodeResult::Failed;
 	}
+	
 
 //	auto Index = BlackboardComp->GetValueAsInt(FName("NextWaypointIndex"));
 	int32 Index = BlackboardComp->GetValueAsInt(IndexKey.SelectedKeyName);
 	int32 CurrentIndex = SetNextWayPoint(Index);
 	CycleWaypointIndex(CurrentIndex);
 	//UE_LOG(LogTemp, Warning, TEXT("Waypoint index: %i."), Index);
-
+	
 	return EBTNodeResult::Succeeded;
 }
 
