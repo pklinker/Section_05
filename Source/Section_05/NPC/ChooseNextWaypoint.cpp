@@ -4,7 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
-#include "Public/PatrolRouteComponent.h"
+#include "PatrolRouteComponent.h"
 EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Executing AI Task."));
