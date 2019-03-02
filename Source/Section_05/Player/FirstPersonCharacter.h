@@ -66,7 +66,7 @@ public:
 
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class ASection_05Projectile> ProjectileClass;
+	TSubclassOf<class AFirstPersonProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
