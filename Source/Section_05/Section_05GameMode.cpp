@@ -2,7 +2,7 @@
 
 #include "Section_05GameMode.h"
 #include "Section_05HUD.h"
-#include "Section_05Character.h"
+#include "./Player/FirstPersonCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 ASection_05GameMode::ASection_05GameMode()
