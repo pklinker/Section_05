@@ -12,7 +12,7 @@ ARifle::ARifle()
 	PrimaryActorTick.bCanEverTick = true;
 	// Create a gun mesh component
 	RifleComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
-	RifleComponent->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
+	RifleComponent->SetOnlyOwnerSee(false);			// only the owning player will see this mesh
 	RifleComponent->bCastDynamicShadow = false;
 	RifleComponent->CastShadow = false;
 	// RifleComponent->SetupAttachment(Mesh1P, TEXT("GripPoint"));
@@ -21,6 +21,27 @@ ARifle::ARifle()
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleLocation->SetupAttachment(RifleComponent);
 	MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+}
+
+FVector ARifle::GetMuzzleLocation()
+{
+	if (!ensure(MuzzleLocation))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Rifle muzzle is missing."));
+		return FVector();
+	}
+	return MuzzleLocation->GetComponentLocation();
+}
+
+FRotator ARifle::GetMuzzleRotation()
+{
+	if (!ensure(MuzzleLocation)) {
+		UE_LOG(LogTemp, Warning, TEXT("Rifle muzzle is missing."));
+		return FRotator();
+	}
+
+	FRotator MuzzleRotator = MuzzleLocation->GetComponentRotation();
+	return MuzzleRotator;
 }
 
 // Called when the game starts or when spawned

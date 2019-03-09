@@ -40,7 +40,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		class UAnimInstance* AnimInstance;
 
-
+	FVector GetMuzzleLocation();
+	FRotator GetMuzzleRotation();
 
 protected:
 	// Called when the game starts or when spawned
