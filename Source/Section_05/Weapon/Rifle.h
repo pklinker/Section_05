@@ -27,8 +27,8 @@ public:
 		FVector GunOffset;
 
 	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-		TSubclassOf<class AFirstPersonProjectile> ProjectileClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup") /// this make it editable on the blueprint only
+		TSubclassOf<class AFirstPersonProjectile> ProjectileBlueprint;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -38,7 +38,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		class UAnimMontage* FireAnimation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		class UAnimInstance* AnimInstance;
+		UAnimInstance* AnimInstance;
 
 	FVector GetMuzzleLocation();
 	FRotator GetMuzzleRotation();
@@ -47,11 +47,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	/** Fires a projectile. */
-	void OnFire();
+
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	/** Fires a projectile. */
+	void Fire();
 };

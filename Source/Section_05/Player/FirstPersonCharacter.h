@@ -60,8 +60,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector GunOffset;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup") /// this make it editable on the blueprint only
-		TSubclassOf<AFirstPersonProjectile> ProjectileBlueprint; // consider https://docs.unrealengine.com/latest/INT/Programming/UnrealArchitecture/TSubclassOf
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup") /// this make it editable on the blueprint only
 		TSubclassOf<ARifle> RifleBlueprint; // consider https://docs.unrealengine.com/latest/INT/Programming/UnrealArchitecture/TSubclassOf
@@ -85,8 +83,6 @@ public:
 
 protected:
 	
-	/** Fires a projectile. */
-	void OnFire();
 
 	/** Resets HMD orientation and position in VR. */
 	void OnResetVR();
@@ -134,6 +130,8 @@ protected:
 	 * @returns true if touch controls were enabled.
 	 */
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
+
+	void FireWeapon();
 
 public:
 	/** Returns Mesh1P subobject **/

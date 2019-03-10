@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Weapon/FirstPersonProjectile.h"
 #include "Animation/AnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 ARifle::ARifle()
@@ -48,8 +49,6 @@ FRotator ARifle::GetMuzzleRotation()
 void ARifle::BeginPlay()
 {
 	Super::BeginPlay();
-	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-//	RifleComponent->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 }
 
@@ -60,11 +59,15 @@ void ARifle::Tick(float DeltaTime)
 
 }
 
-void ARifle::OnFire()
+void ARifle::Fire()
 {
+ // RifleBlueprint is firing.
+
 	// try and fire a projectile
-	if (ProjectileClass != NULL)
+	if (ProjectileBlueprint != NULL)
 	{
+		
+
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
@@ -78,7 +81,7 @@ void ARifle::OnFire()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 			// spawn the projectile at the muzzle
-			World->SpawnActor<AFirstPersonProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			World->SpawnActor<AFirstPersonProjectile>(ProjectileBlueprint, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
 	}
 
@@ -91,8 +94,10 @@ void ARifle::OnFire()
 	// try and play a firing animation if specified
 	if (FireAnimation != NULL)
 	{
+		
 		if (AnimInstance != NULL)
 		{
+		//	UE_LOG(LogTemp, Warning, TEXT("RifleBlueprint AnimInstance not null."));
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
