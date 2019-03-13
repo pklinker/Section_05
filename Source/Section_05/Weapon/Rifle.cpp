@@ -21,7 +21,8 @@ ARifle::ARifle()
 
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleLocation->SetupAttachment(RifleComponent);
-	MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+//	MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
+	MuzzleLocation->SetRelativeLocation(FVector(0.2f, 0.0f, -10.6f));
 }
 
 FVector ARifle::GetMuzzleLocation()
