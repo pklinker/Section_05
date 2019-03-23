@@ -13,16 +13,15 @@ ARifle::ARifle()
 	PrimaryActorTick.bCanEverTick = true;
 	// Create a gun mesh component
 	RifleComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
-	RifleComponent->SetOnlyOwnerSee(false);			// only the owning player will see this mesh
 	RifleComponent->bCastDynamicShadow = false;
 	RifleComponent->CastShadow = false;
 	// RifleComponent->SetupAttachment(Mesh1P, TEXT("GripPoint"));
-	RifleComponent->SetupAttachment(RootComponent);
+//	RifleComponent->SetupAttachment(RootComponent);
 
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleLocation->SetupAttachment(RifleComponent);
 //	MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
-	MuzzleLocation->SetRelativeLocation(FVector(0.2f, 0.0f, -10.6f));
+	MuzzleLocation->SetRelativeLocation(FVector(0.2f, 0.0f, 0.0f));
 }
 
 FVector ARifle::GetMuzzleLocation()
