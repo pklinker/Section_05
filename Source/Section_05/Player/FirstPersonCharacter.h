@@ -80,6 +80,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
 
+	UFUNCTION(BlueprintCallable)
+	void FireWeapon();
 
 protected:
 	
@@ -131,7 +133,7 @@ protected:
 	 */
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
 
-	void FireWeapon();
+
 
 public:
 	/** Returns Mesh1P subobject **/
