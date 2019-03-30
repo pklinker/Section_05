@@ -7,7 +7,7 @@
 #include "PatrolRouteComponent.h"
 EBTNodeResult::Type UChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Executing AI Task."));
+//	UE_LOG(LogTemp, Warning, TEXT("Executing AI Task."));
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 	
 	// get the patrol points
