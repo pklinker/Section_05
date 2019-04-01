@@ -1,0 +1,17 @@
+Every tick,
+1) have the NPC (AIController) focus on the player, identified by the Actor Key.
+2) Get the player and set their location into the last seen location key.
+
+If the NPC can see the player  then move to them until they are reached (Chase behavior) while shooting.
+
+If the enemy is not found, but not chasing, move to their last know location and look for them (Suspicion Beahvior), if you haven't visited their last known location.
+
+Patrol for the enemy if the enemy is unknown and has no last known location. Start patrolling (Patrol behavior).
+
+Simple version:
+
+If you can see the enemy and not within 3m, shoot at the enemy and move within 3m of the enemy. Add 1m to the range to account for capsule sizes. So range = 400 on IsWithinRange while MoveTo acceptable radius is 300.
+If you can see the enemy and within 3m, shoot at the enemy.
+
+If you can't see the enemy, but haven't visited last known location, visit that location.
+Else, go to the next patrol point
