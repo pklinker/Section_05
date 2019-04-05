@@ -64,12 +64,12 @@ void ARifle::Fire()
  // RifleBlueprint is firing.
 
 	// try and fire a projectile
-	if (ProjectileBlueprint != NULL)
+	if (ProjectileBlueprint != nullptr)
 	{
 		
 
 		UWorld* const World = GetWorld();
-		if (World != NULL)
+		if (World != nullptr)
 		{
 			//const FRotator SpawnRotation = GetActorRotation();
 			const FRotator SpawnRotation = MuzzleLocation->GetComponentRotation();
@@ -86,19 +86,21 @@ void ARifle::Fire()
 	}
 
 	// try and play the sound if specified
-	if (FireSound != NULL)
+	if (FireSound != nullptr)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
 
 	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
+	if ((FireAnimation1P != nullptr) && (AnimInstance1P != nullptr))
 	{
-		
-		if (AnimInstance != NULL)
-		{
 		//	UE_LOG(LogTemp, Warning, TEXT("RifleBlueprint AnimInstance not null."));
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
+		AnimInstance1P->Montage_Play(FireAnimation1P, 1.f);
+	}
+
+	if ((FireAnimation3P != nullptr) && (AnimInstance3P != nullptr))
+	{
+		//	UE_LOG(LogTemp, Warning, TEXT("RifleBlueprint AnimInstance not null."));
+		AnimInstance3P->Montage_Play(FireAnimation3P, 1.f);
 	}
 }

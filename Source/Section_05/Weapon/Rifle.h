@@ -31,14 +31,19 @@ public:
 		TSubclassOf<class AFirstPersonProjectile> ProjectileBlueprint;
 
 	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
 		class USoundBase* FireSound;
 
 	/** AnimMontage to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		class UAnimMontage* FireAnimation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-		UAnimInstance* AnimInstance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+		class UAnimMontage* FireAnimation1P;
+	/** AnimMontage to play each time third person fires */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+		class UAnimMontage* FireAnimation3P;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+		UAnimInstance* AnimInstance1P;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
+		UAnimInstance* AnimInstance3P;
 
 	FVector GetMuzzleLocation();
 	FRotator GetMuzzleRotation();

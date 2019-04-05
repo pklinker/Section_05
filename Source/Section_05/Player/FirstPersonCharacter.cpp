@@ -84,7 +84,7 @@ void AFirstPersonCharacter::BeginPlay()
 	Rifle = GetWorld()->SpawnActor<ARifle>(RifleBlueprint);
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	Rifle->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-	Rifle->AnimInstance = Mesh1P->GetAnimInstance();
+	Rifle->AnimInstance1P = Mesh1P->GetAnimInstance();
 
 	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
 	if (bUsingMotionControllers)
