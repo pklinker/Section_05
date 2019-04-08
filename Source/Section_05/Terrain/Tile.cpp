@@ -12,8 +12,20 @@ ATile::ATile()
 	PrimaryActorTick.bCanEverTick = true;
 
 }
+void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint)
+{
+	//		const FRotator SpawnRotation = GetActorRotation();
+			//Set Spawn Collision Handling Override
+	//		FActorSpawnParameters ActorSpawnParams;
+	//		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	//		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(*ToSpawn, SpawnPoint, SpawnRotation,ActorSpawnParams);
+	AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ToSpawn);
+	UE_LOG(LogTemp, Warning, TEXT("Random point: %s spawned actor %s."), *SpawnPoint.ToString(), *SpawnedActor->GetFName().ToString());
+	SpawnedActor->SetActorRelativeLocation(SpawnPoint);
+	SpawnedActor->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+}
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors)
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius)
 {
 	// set a minimum of 1 to prevent weirdness
 	if (MinSpawnedActors < 0)
@@ -27,20 +39,13 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int M
 	}
 	int NumActorsToSpawn = FMath::RandRange(MinSpawnedActors, MaxSpawnedActors);
 	UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i actors =======================================."), NumActorsToSpawn);
-	FVector BackLeftVector = FVector(0, -2000, 0);
-	FVector FarRightVector = FVector(4000, 2000, 0);
 	for (size_t i = 0; i < NumActorsToSpawn; i++) {
-		FVector SpawnPoint = FMath::RandPointInBox(FBox(BackLeftVector, FarRightVector));
-//		const FRotator SpawnRotation = GetActorRotation();
-		//Set Spawn Collision Handling Override
-//		FActorSpawnParameters ActorSpawnParams;
-//		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-//		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(*ToSpawn, SpawnPoint, SpawnRotation,ActorSpawnParams);
-
-		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ToSpawn);
-		UE_LOG(LogTemp, Warning, TEXT("Random point: %s spawned actor %s."), *SpawnPoint.ToString(), *SpawnedActor->GetFName().ToString());
-		SpawnedActor->SetActorRelativeLocation(SpawnPoint);
-		SpawnedActor->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		FVector SpawnPoint;
+		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPoint, Radius);
+		if (SpawnPointFound)
+		{
+			PlaceActor(ToSpawn, SpawnPoint);
+		}
 	}
 }
 
@@ -48,10 +53,6 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int M
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-	CastSphere(GetActorLocation(), 300.0f);
-	CastSphere(GetActorLocation() + FVector(800, 0, 0), 300.0f);
-	
-	
 }
 
 // Called every frame
@@ -67,19 +68,42 @@ True if it hits anything using sphere casting.
 bool ATile::CastSphere(FVector Location, float Radius)
 {
 	FHitResult  HitResult; // not used
+	FVector GlobalLocation = ActorToWorld().TransformPosition(Location);
 	// channel is where each object makes a decision of how it reacts to the channel. Make sure trigger volumes ignore SpawnTraceChannel
 	bool HitOccurred = GetWorld()->SweepSingleByChannel(
 		HitResult,
-		Location, /// we are placing an item in the world so the start and end locations are the same becuase we are looking for collisions with existing objects.
-		Location,
+		GlobalLocation, /// we are placing an item in the world so the start and end locations are the same becuase we are looking for collisions with existing objects.
+		GlobalLocation,
 		FQuat::Identity, /// Zero rotation, we don't want a rotation. So no effect.
 		ECollisionChannel::ECC_GameTraceChannel2, // this is tied to the custom SpawnTraceChannel found in config\DefaultEngine.ini
 		FCollisionShape::MakeSphere(Radius)
 		);
 
 	FColor ResultColor = HitOccurred ? FColor::Red : FColor::Green;
-	//DrawDebugSphere(GetWorld(), Location, Radius, 32, ResultColor, true, 100);
-	DrawDebugCapsule(GetWorld(), Location, 0, Radius, FQuat::Identity, ResultColor, true, 100);
+	DrawDebugSphere(GetWorld(), GlobalLocation, Radius, 32, ResultColor, true, 300);
+	UE_LOG(LogTemp, Warning, TEXT("Drawing debug capsule at %s."), *Location.ToString());
+
+//	DrawDebugCapsule(GetWorld(), Location, 0, Radius, FQuat::Identity, ResultColor, true, 100);
 	return HitOccurred;
+}
+
+bool ATile::GetEmptySpawnPoint(FVector &SpawnPoint, float Radius)
+{
+	bool keeptrying = true;
+	int i = 0;
+	while (keeptrying)
+	{
+		SpawnPoint = FMath::RandPointInBox(FBox(BackLeftVector, FarRightVector));
+
+		if (!CastSphere(SpawnPoint, Radius))
+		{
+			return true;
+		}
+		if (i >= MAX_TRIES) {
+			keeptrying = false;
+		}
+		i = i++;
+	}
+	return false;
 }
 

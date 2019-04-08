@@ -15,11 +15,17 @@ public:
 	// Sets default values for this actor's properties
 	ATile();
 	UFUNCTION(BlueprintCallable, Category="Setup")
-		void  PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors);
+		void  PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+		int MAX_TRIES = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+		FVector BackLeftVector = FVector(0, -2000, 0);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
+		FVector FarRightVector = FVector(4000, 2000, 0);
 
 public:	
 	// Called every frame
@@ -27,4 +33,8 @@ public:
 
 private:
 	bool CastSphere(FVector Location, float Radius);
+	bool GetEmptySpawnPoint(FVector &SpawnPoint, float Radius);
+	void PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint);
+
+
 };
