@@ -12,7 +12,7 @@ ATile::ATile()
 	PrimaryActorTick.bCanEverTick = true;
 
 }
-void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint)
+void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float YawRotation, float Scale)
 {
 	//		const FRotator SpawnRotation = GetActorRotation();
 			//Set Spawn Collision Handling Override
@@ -23,9 +23,11 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint)
 	UE_LOG(LogTemp, Warning, TEXT("Random point: %s spawned actor %s."), *SpawnPoint.ToString(), *SpawnedActor->GetFName().ToString());
 	SpawnedActor->SetActorRelativeLocation(SpawnPoint);
 	SpawnedActor->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+	SpawnedActor->SetActorRotation(FRotator(0, YawRotation, 0));
+	SpawnedActor->SetActorScale3D(FVector(Scale, Scale, Scale));
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius)
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale, float MaximumScale)
 {
 	// set a minimum of 1 to prevent weirdness
 	if (MinSpawnedActors < 0)
@@ -41,10 +43,13 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int M
 	UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i actors =======================================."), NumActorsToSpawn);
 	for (size_t i = 0; i < NumActorsToSpawn; i++) {
 		FVector SpawnPoint;
-		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPoint, Radius);
+		float Scale = FMath::RandRange(MinimumScale, MaximumScale);
+		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPoint, Radius*Scale);
 		if (SpawnPointFound)
 		{
-			PlaceActor(ToSpawn, SpawnPoint);
+			float RandomYawRotation = FMath::RandRange(-180.f, 180.f);
+			
+			PlaceActor(ToSpawn, SpawnPoint, RandomYawRotation, Scale);
 		}
 	}
 }
