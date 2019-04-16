@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Tile.generated.h"
+
 
 UCLASS()
 class SECTION_05_API ATile : public AActor
@@ -16,6 +18,8 @@ public:
 	ATile();
 	UFUNCTION(BlueprintCallable, Category="Setup")
 		void  PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale = 1.0, float MaximumScale = 1.0);
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+		void PlaceGrass(int NumberOfGrassTextures, bool RandomQuantity);
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,6 +30,8 @@ protected:
 		FVector BackLeftVector = FVector(0, -2000, 0);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 		FVector FarRightVector = FVector(4000, 2000, 0);
+	UPROPERTY(BlueprintReadOnly, Category = "Setup")
+		UHierarchicalInstancedStaticMeshComponent* MeshPool;
 
 public:	
 	// Called every frame
@@ -35,6 +41,6 @@ private:
 	bool CastSphere(FVector Location, float Radius);
 	bool GetEmptySpawnPoint(FVector &SpawnPoint, float Radius);
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float YawRotation, float Scale);
-
-
+	void SpawnGrass(FTransform initialTransform, uint32 actorId);
+	TMap<uint32, uint32> IdToInstanceMapping;
 };

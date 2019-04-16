@@ -2,7 +2,6 @@
 
 #include "Tile.h"
 #include "Engine/World.h"
-#include "GameFramework/Actor.h"
 #include "DrawDebugHelpers.h"
 
 // Sets default values
@@ -20,7 +19,7 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float Ya
 	//		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	//		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(*ToSpawn, SpawnPoint, SpawnRotation,ActorSpawnParams);
 	AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ToSpawn);
-	UE_LOG(LogTemp, Warning, TEXT("Random point: %s spawned actor %s."), *SpawnPoint.ToString(), *SpawnedActor->GetFName().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Random point: %s spawned actor %s."), *SpawnPoint.ToString(), *SpawnedActor->GetFName().ToString());
 	SpawnedActor->SetActorRelativeLocation(SpawnPoint);
 	SpawnedActor->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	SpawnedActor->SetActorRotation(FRotator(0, YawRotation, 0));
@@ -40,7 +39,7 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int M
 		MaxSpawnedActors = MinSpawnedActors + 1;
 	}
 	int NumActorsToSpawn = FMath::RandRange(MinSpawnedActors, MaxSpawnedActors);
-	UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i actors =======================================."), NumActorsToSpawn);
+	//UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i actors =======================================."), NumActorsToSpawn);
 	for (size_t i = 0; i < NumActorsToSpawn; i++) {
 		FVector SpawnPoint;
 		float Scale = FMath::RandRange(MinimumScale, MaximumScale);
@@ -53,7 +52,43 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int M
 		}
 	}
 }
+/**
+* If RandomQuantity is true then it will use the NumberOfGrassTextures as a maximum in a random number generator
+NOT USED YET
+*/
+void ATile::PlaceGrass(int NumberOfGrassTextures, bool RandomQuantity)
+{
+	int NumGrassToSpawn = NumberOfGrassTextures;
+	if (RandomQuantity)
+	{
+		NumGrassToSpawn = FMath::RandRange(1, NumberOfGrassTextures);
+	}
+//	UHierarchicalInstancedStaticMeshComponent HISMC_GrassTexture = UHierarchicalInstancedStaticMeshComponent();
 
+	UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i grass textures =======================================."), NumGrassToSpawn);
+	for (size_t i = 0; i < NumGrassToSpawn; i++) {
+		FVector SpawnPoint;
+	
+		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPoint, 100);
+		if (SpawnPointFound)
+		{
+			float RandomYawRotation = FMath::RandRange(-180.f, 180.f);
+			FRotator Rotation = FRotator(0, RandomYawRotation, 0);
+			FTransform grassTransform;
+			grassTransform.SetLocation(SpawnPoint);
+			//FRotator CachedRotator = foundSocket->RelativeRotation.GetNormalized();
+			grassTransform.SetRotation(Rotation.Quaternion());
+			//grassTransform.SetScale3D(1.0f);
+			SpawnGrass(grassTransform, i);
+		//	PlaceActor(ToSpawn, SpawnPoint, RandomYawRotation, Scale);
+		}
+	}
+}
+
+void ATile::SpawnGrass(FTransform initialTransform, uint32 actorId) {
+	int32 index = MeshPool->AddInstanceWorldSpace(initialTransform);
+	IdToInstanceMapping.Add(actorId, index);
+}
 // Called when the game starts or when spawned
 void ATile::BeginPlay()
 {
@@ -85,8 +120,8 @@ bool ATile::CastSphere(FVector Location, float Radius)
 		);
 
 	FColor ResultColor = HitOccurred ? FColor::Red : FColor::Green;
-	DrawDebugSphere(GetWorld(), GlobalLocation, Radius, 32, ResultColor, true, 300);
-	UE_LOG(LogTemp, Warning, TEXT("Drawing debug capsule at %s."), *Location.ToString());
+	//DrawDebugSphere(GetWorld(), GlobalLocation, Radius, 32, ResultColor, true, 300);
+	//UE_LOG(LogTemp, Warning, TEXT("Drawing debug capsule at %s."), *Location.ToString());
 
 //	DrawDebugCapsule(GetWorld(), Location, 0, Radius, FQuat::Identity, ResultColor, true, 100);
 	return HitOccurred;
