@@ -3,6 +3,7 @@
 #include "Tile.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "EngineUtils.h"
 
 // Sets default values
 ATile::ATile()
@@ -93,6 +94,7 @@ void ATile::SpawnGrass(FTransform initialTransform, uint32 actorId) {
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 // Called every frame
