@@ -15,6 +15,7 @@ class SECTION_05_API UActorPool : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UActorPool();
+	// Call CheckoutActor when you want to get exclusive access to an actor from the pool 
 	AActor* CheckoutActor();
 	void ReturnActor(AActor *ActorToReturn);
 	void Add(AActor *ActorToAdd);
@@ -23,6 +24,8 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	TArray<class AActor*> FreeActors;
+	TArray<class AActor*> CheckedOutActors;
 
 public:	
 	// Called every frame

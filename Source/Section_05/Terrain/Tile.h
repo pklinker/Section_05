@@ -23,16 +23,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 		void SetNavVolumeActorPool(UActorPool *InPool);
 
+	void PositionNavMeshBoundsVolume();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 		int MAX_TRIES = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 		FVector BackLeftVector = FVector(0, -2000, 0);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 		FVector FarRightVector = FVector(4000, 2000, 0);
-	UPROPERTY(BlueprintReadOnly, Category = "Setup")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 		UHierarchicalInstancedStaticMeshComponent* MeshPool;
 
 public:	
@@ -46,4 +49,5 @@ private:
 	void SpawnGrass(FTransform initialTransform, uint32 actorId);
 	TMap<uint32, uint32> IdToInstanceMapping;
 	UActorPool *NavMeshVolumeActorPool;
+	AActor *NavMeshVolumeActor;
 };

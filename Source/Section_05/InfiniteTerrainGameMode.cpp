@@ -6,36 +6,41 @@
 #include "Public/EngineUtils.h"
 
 
-AInfiniteTerrainGameMode::AInfiniteTerrainGameMode() : Super()
+AInfiniteTerrainGameMode::AInfiniteTerrainGameMode()
 {
-	
 	NavMeshVolumeActorPool = CreateDefaultSubobject<UActorPool>(FName("Nav Mesh Volume Actor Pool"));
+//	PopulateVolumeBoundsPool();
 }
 
-void AInfiniteTerrainGameMode::AddToPool(AVolume *NavMeshBV) 
-{
-	if (NavMeshBV)
-	{
-//		UE_LOG(LogTemp, Warning, TEXT("Determing whether to add to pool %s."), *NavMeshBV->GetName());
-		FString VolumeName = *NavMeshBV->GetName();
-		if (VolumeName.Contains(FString("NavMesh"), ESearchCase::CaseSensitive, ESearchDir::FromStart))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Adding to pool %s."), *NavMeshBV->GetName());
-			NavMeshBoundsVolumes.Add(NavMeshBV);
-		}
-	}
 
-}
-
+// Put the nav mesh volumes to the actor pool. This sends all volumes to add to pool 
 void AInfiniteTerrainGameMode::PopulateVolumeBoundsPool()
 {
-	UE_LOG(LogTemp, Warning, TEXT("PopulateVolumeBoundsPool."));
+	UE_LOG(LogTemp, Warning, TEXT("PopulateVolumeBoundsPool shouldn't be called yet."));
 	auto VolumeIterator = TActorIterator<AVolume>(GetWorld());
+
 	while (VolumeIterator)
 	{
 		AddToPool(*VolumeIterator);
 		// moves to the next instance of type ANavMeshBoundsVolume
 		++VolumeIterator;
+	}
+
+}
+
+// Adds a Nav mesh volume to the ActorPool
+void AInfiniteTerrainGameMode::AddToPool(AVolume *NavMeshBV)
+{
+	if (NavMeshBV != nullptr)
+	{
+		//		UE_LOG(LogTemp, Warning, TEXT("Determing whether to add to pool %s."), *NavMeshBV->GetName());
+		FString VolumeName = *NavMeshBV->GetName();
+		if (VolumeName.Contains(FString("NavMesh"), ESearchCase::CaseSensitive, ESearchDir::FromStart))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Adding to pool %s."), *NavMeshBV->GetName());
+			
+			NavMeshBoundsVolumes.Add(NavMeshBV);
+		}
 	}
 
 }

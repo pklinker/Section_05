@@ -89,10 +89,37 @@ void ATile::PlaceGrass(int NumberOfGrassTextures, bool RandomQuantity)
 
 void ATile::SetNavVolumeActorPool(UActorPool * InPool)
 {
+	if (!InPool)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ATile InPool parameter is null."));
+		return;
+	}
 	NavMeshVolumeActorPool = InPool;
+	PositionNavMeshBoundsVolume();
+}
+
+// Set the location of the nav mesh to the location of the tile it will be covering.
+void ATile::PositionNavMeshBoundsVolume()
+{
+	if (NavMeshVolumeActorPool == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActorPool is null in the Tile."));
+		return;
+	}
+	AActor *NavMeshBoundsVolume = NavMeshVolumeActorPool->CheckoutActor();
+	if (NavMeshBoundsVolume == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("NavMeshBoundsVolume is null in the Tile."));
+		return;
+	}
+	NavMeshBoundsVolume->SetActorLocation(GetActorLocation());
 }
 
 void ATile::SpawnGrass(FTransform initialTransform, uint32 actorId) {
+	if (MeshPool == nullptr)
+	{
+		return;
+	}
 	int32 index = MeshPool->AddInstanceWorldSpace(initialTransform);
 	IdToInstanceMapping.Add(actorId, index);
 }
@@ -100,7 +127,24 @@ void ATile::SpawnGrass(FTransform initialTransform, uint32 actorId) {
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
+	if (!NavMeshVolumeActorPool)
+	{
+		UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActorPool is null in the Tile BeginPlay."));
+		return;
+	}
+	NavMeshVolumeActor = NavMeshVolumeActorPool->CheckoutActor();
+}
 
+void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	UE_LOG(LogTemp, Warning, TEXT("[%s] EndPlay"), *GetName());
+	if (!NavMeshVolumeActorPool)
+	{
+		UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActorPool is null in the Tile EndPlay."));
+		return;
+	}
+	NavMeshVolumeActorPool->ReturnActor(NavMeshVolumeActor);
 }
 
 // Called every frame

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ActorPool.h"
+#include "GameFramework/Actor.h"
 
 // Sets default values for this component's properties
 
@@ -16,15 +17,35 @@ UActorPool::UActorPool()
 
 AActor * UActorPool::CheckoutActor()
 {
-	return nullptr;
+	AActor *TheActor = nullptr;
+	if (FreeActors.Num() > 0)
+	{
+		TheActor = FreeActors.Pop(true);
+		if (TheActor)
+		{
+			CheckedOutActors.Push(TheActor);
+		}
+	} 
+	return TheActor;
 }
 
 void UActorPool::ReturnActor(AActor * ActorToReturn)
 {
+	if (ActorToReturn) 
+	{
+		if (CheckedOutActors.Num() > 0) {
+			CheckedOutActors.Remove(ActorToReturn);
+		}
+		FreeActors.Push(ActorToReturn);
+	}
 }
 
 void UActorPool::Add(AActor * ActorToAdd)
 {
+	if (ActorToAdd)
+	{
+		FreeActors.Push(ActorToAdd);
+	}
 }
 
 // Called when the game starts
