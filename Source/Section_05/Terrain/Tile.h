@@ -7,7 +7,7 @@
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Tile.generated.h"
 
-
+class UActorPool;
 UCLASS()
 class SECTION_05_API ATile : public AActor
 {
@@ -20,6 +20,8 @@ public:
 		void  PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale = 1.0, float MaximumScale = 1.0);
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 		void PlaceGrass(int NumberOfGrassTextures, bool RandomQuantity);
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+		void SetNavVolumeActorPool(UActorPool *InPool);
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,4 +45,5 @@ private:
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float YawRotation, float Scale);
 	void SpawnGrass(FTransform initialTransform, uint32 actorId);
 	TMap<uint32, uint32> IdToInstanceMapping;
+	UActorPool *NavMeshVolumeActorPool;
 };

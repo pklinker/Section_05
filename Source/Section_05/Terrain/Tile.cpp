@@ -3,6 +3,7 @@
 #include "Tile.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "ActorPool.h"
 #include "EngineUtils.h"
 
 // Sets default values
@@ -84,6 +85,11 @@ void ATile::PlaceGrass(int NumberOfGrassTextures, bool RandomQuantity)
 		//	PlaceActor(ToSpawn, SpawnPoint, RandomYawRotation, Scale);
 		}
 	}
+}
+
+void ATile::SetNavVolumeActorPool(UActorPool * InPool)
+{
+	NavMeshVolumeActorPool = InPool;
 }
 
 void ATile::SpawnGrass(FTransform initialTransform, uint32 actorId) {
