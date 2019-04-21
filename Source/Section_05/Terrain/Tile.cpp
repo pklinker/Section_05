@@ -4,6 +4,7 @@
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 #include "ActorPool.h"
+#include "AI/NavigationSystemBase.h"
 #include "EngineUtils.h"
 
 // Sets default values
@@ -11,7 +12,7 @@ ATile::ATile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	NavigationBoundsOffset = FVector(2000, 0, 0);
 }
 void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float YawRotation, float Scale)
 {
@@ -112,7 +113,8 @@ void ATile::PositionNavMeshBoundsVolume()
 		UE_LOG(LogTemp, Error, TEXT("NavMeshBoundsVolume is null in the Tile."));
 		return;
 	}
-	NavMeshBoundsVolume->SetActorLocation(GetActorLocation());
+	NavMeshBoundsVolume->SetActorLocation(GetActorLocation()+ NavigationBoundsOffset);
+	FNavigationSystem::Build(*GetWorld());
 }
 
 void ATile::SpawnGrass(FTransform initialTransform, uint32 actorId) {
@@ -129,10 +131,10 @@ void ATile::BeginPlay()
 	Super::BeginPlay();
 	if (!NavMeshVolumeActorPool)
 	{
-		UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActorPool is null in the Tile BeginPlay."));
+	//	UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActorPool is null in the Tile BeginPlay."));
 		return;
 	}
-	NavMeshVolumeActor = NavMeshVolumeActorPool->CheckoutActor();
+//	NavMeshVolumeActor = NavMeshVolumeActorPool->CheckoutActor();
 }
 
 void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)

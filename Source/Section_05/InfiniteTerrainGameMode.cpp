@@ -9,14 +9,13 @@
 AInfiniteTerrainGameMode::AInfiniteTerrainGameMode()
 {
 	NavMeshVolumeActorPool = CreateDefaultSubobject<UActorPool>(FName("Nav Mesh Volume Actor Pool"));
-//	PopulateVolumeBoundsPool();
 }
 
 
 // Put the nav mesh volumes to the actor pool. This sends all volumes to add to pool 
 void AInfiniteTerrainGameMode::PopulateVolumeBoundsPool()
 {
-	UE_LOG(LogTemp, Warning, TEXT("PopulateVolumeBoundsPool shouldn't be called yet."));
+	UE_LOG(LogTemp, Warning, TEXT("PopulateVolumeBoundsPool called."));
 	auto VolumeIterator = TActorIterator<AVolume>(GetWorld());
 
 	while (VolumeIterator)
@@ -39,7 +38,7 @@ void AInfiniteTerrainGameMode::AddToPool(AVolume *NavMeshBV)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Adding to pool %s."), *NavMeshBV->GetName());
 			
-			NavMeshBoundsVolumes.Add(NavMeshBV);
+			NavMeshVolumeActorPool->Add(NavMeshBV);
 		}
 	}
 

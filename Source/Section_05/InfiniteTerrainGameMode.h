@@ -22,7 +22,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Bounds Pool")
 	void PopulateVolumeBoundsPool();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bounds Pool")
-		UActorPool *NavMeshVolumeActorPool;
+	UActorPool *NavMeshVolumeActorPool;
 
 protected:
 	void AddToPool(class AVolume *NavMeshBV);

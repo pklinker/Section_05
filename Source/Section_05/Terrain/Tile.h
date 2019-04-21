@@ -37,7 +37,8 @@ protected:
 		FVector FarRightVector = FVector(4000, 2000, 0);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Setup")
 		UHierarchicalInstancedStaticMeshComponent* MeshPool;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Navigation")
+		FVector NavigationBoundsOffset;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
