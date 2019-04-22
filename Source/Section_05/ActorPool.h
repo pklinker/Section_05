@@ -17,15 +17,15 @@ public:
 	UActorPool();
 	// Call CheckoutActor when you want to get exclusive access to an actor from the pool 
 	AActor* CheckoutActor();
-	void ReturnActor(AActor *ActorToReturn);
+	// Call CheckinActor when done using the actor
+	void CheckinActor(AActor *ActorToReturn);
 	void Add(AActor *ActorToAdd);
 
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	TArray<class AActor*> FreeActors;
-	TArray<class AActor*> CheckedOutActors;
+	TArray<AActor*> FreeActors;
 
 public:	
 	// Called every frame

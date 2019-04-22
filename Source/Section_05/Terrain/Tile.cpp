@@ -107,13 +107,13 @@ void ATile::PositionNavMeshBoundsVolume()
 		UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActorPool is null in the Tile."));
 		return;
 	}
-	AActor *NavMeshBoundsVolume = NavMeshVolumeActorPool->CheckoutActor();
-	if (NavMeshBoundsVolume == nullptr)
+	NavMeshVolumeActor = NavMeshVolumeActorPool->CheckoutActor();
+	if (NavMeshVolumeActor == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("NavMeshBoundsVolume is null in the Tile."));
 		return;
 	}
-	NavMeshBoundsVolume->SetActorLocation(GetActorLocation()+ NavigationBoundsOffset);
+	NavMeshVolumeActor->SetActorLocation(GetActorLocation()+ NavigationBoundsOffset);
 	FNavigationSystem::Build(*GetWorld());
 }
 
@@ -129,24 +129,24 @@ void ATile::SpawnGrass(FTransform initialTransform, uint32 actorId) {
 void ATile::BeginPlay()
 {
 	Super::BeginPlay();
-	if (!NavMeshVolumeActorPool)
-	{
-	//	UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActorPool is null in the Tile BeginPlay."));
-		return;
-	}
-//	NavMeshVolumeActor = NavMeshVolumeActorPool->CheckoutActor();
 }
 
 void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	UE_LOG(LogTemp, Warning, TEXT("[%s] EndPlay"), *GetName());
 	if (!NavMeshVolumeActorPool)
 	{
 		UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActorPool is null in the Tile EndPlay."));
 		return;
 	}
-	NavMeshVolumeActorPool->ReturnActor(NavMeshVolumeActor);
+	else if (!NavMeshVolumeActor)
+	{
+		UE_LOG(LogTemp, Error, TEXT("NavMeshVolumeActor is null in the Tile EndPlay."));
+		return;
+
+	}
+	UE_LOG(LogTemp, Warning, TEXT("[%s] EndPlay, checking in: %s"), *GetName(), *NavMeshVolumeActor->GetName());
+	NavMeshVolumeActorPool->CheckinActor(NavMeshVolumeActor);
 }
 
 // Called every frame

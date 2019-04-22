@@ -21,29 +21,21 @@ AActor * UActorPool::CheckoutActor()
 	if (FreeActors.Num() > 0)
 	{
 		TheActor = FreeActors.Pop(true);
-		if (TheActor)
-		{
-			CheckedOutActors.Push(TheActor);
-		}
+		UE_LOG(LogTemp, Warning, TEXT("Actor %s checked out."), *TheActor->GetName());
 	} 
 	return TheActor;
 }
 
-void UActorPool::ReturnActor(AActor * ActorToReturn)
+void UActorPool::CheckinActor(AActor * ActorToReturn)
 {
-	if (ActorToReturn) 
-	{
-		if (CheckedOutActors.Num() > 0) {
-			CheckedOutActors.Remove(ActorToReturn);
-		}
-		FreeActors.Push(ActorToReturn);
-	}
+	Add(ActorToReturn);
 }
 
 void UActorPool::Add(AActor * ActorToAdd)
 {
 	if (ActorToAdd)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Actor %s checked in."), *ActorToAdd->GetName());
 		FreeActors.Push(ActorToAdd);
 	}
 }
