@@ -14,7 +14,7 @@ ATile::ATile()
 	PrimaryActorTick.bCanEverTick = true;
 	NavigationBoundsOffset = FVector(2000, 0, 0);
 }
-void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float YawRotation, float Scale)
+void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition)
 {
 	//		const FRotator SpawnRotation = GetActorRotation();
 			//Set Spawn Collision Handling Override
@@ -23,36 +23,20 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float Ya
 	//		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(*ToSpawn, SpawnPoint, SpawnRotation,ActorSpawnParams);
 	AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ToSpawn);
 	//UE_LOG(LogTemp, Warning, TEXT("Random point: %s spawned actor %s."), *SpawnPoint.ToString(), *SpawnedActor->GetFName().ToString());
-	SpawnedActor->SetActorRelativeLocation(SpawnPoint);
+	SpawnedActor->SetActorRelativeLocation(SpawnPosition.Location);
 	SpawnedActor->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-	SpawnedActor->SetActorRotation(FRotator(0, YawRotation, 0));
-	SpawnedActor->SetActorScale3D(FVector(Scale, Scale, Scale));
+	SpawnedActor->SetActorRotation(FRotator(0, SpawnPosition.YawRotation, 0));
+	SpawnedActor->SetActorScale3D(FVector(SpawnPosition.Scale, SpawnPosition.Scale, SpawnPosition.Scale));
 }
 
 void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale, float MaximumScale)
 {
-	// set a minimum of 1 to prevent weirdness
-	if (MinSpawnedActors < 0)
+	TArray<FSpawnPosition> SpawnPositionArray = SpawnPositions(MinSpawnedActors, MaxSpawnedActors, Radius, MinimumScale, MaximumScale);
+
+	for (FSpawnPosition SpawnPosition:SpawnPositionArray)
 	{
-		MinSpawnedActors = 0; 
-	}
-	// verify max is greater than min. If not, set max to min+1
-	if (MaxSpawnedActors <= MinSpawnedActors)
-	{
-		MaxSpawnedActors = MinSpawnedActors + 1;
-	}
-	int NumActorsToSpawn = FMath::RandRange(MinSpawnedActors, MaxSpawnedActors);
-	//UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i actors =======================================."), NumActorsToSpawn);
-	for (size_t i = 0; i < NumActorsToSpawn; i++) {
-		FVector SpawnPoint;
-		float Scale = FMath::RandRange(MinimumScale, MaximumScale);
-		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPoint, Radius*Scale);
-		if (SpawnPointFound)
-		{
-			float RandomYawRotation = FMath::RandRange(-180.f, 180.f);
 			
-			PlaceActor(ToSpawn, SpawnPoint, RandomYawRotation, Scale);
-		}
+			PlaceActor(ToSpawn, SpawnPosition);
 	}
 }
 /**
@@ -97,6 +81,35 @@ void ATile::SetNavVolumeActorPool(UActorPool * InPool)
 	}
 	NavMeshVolumeActorPool = InPool;
 	PositionNavMeshBoundsVolume();
+}
+
+TArray<FSpawnPosition> ATile::SpawnPositions(int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale, float MaximumScale)
+{
+	TArray<FSpawnPosition> SpawnPositionArray;
+	// set a minimum of 1 to prevent weirdness
+	if (MinSpawnedActors < 0)
+	{
+		MinSpawnedActors = 0;
+	}
+	// verify max is greater than min. If not, set max to min+1
+	if (MaxSpawnedActors <= MinSpawnedActors)
+	{
+		MaxSpawnedActors = MinSpawnedActors + 1;
+	}
+	int NumActorsToSpawn = FMath::RandRange(MinSpawnedActors, MaxSpawnedActors);
+	//UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i actors =======================================."), NumActorsToSpawn);
+	for (size_t i = 0; i < NumActorsToSpawn; i++) {
+		FSpawnPosition SpawnPosition;
+		SpawnPosition.Scale = FMath::RandRange(MinimumScale, MaximumScale);
+		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPosition.Location, Radius*SpawnPosition.Scale);
+		if (SpawnPointFound)
+		{
+			SpawnPosition.YawRotation = FMath::RandRange(-180.f, 180.f);		
+			SpawnPositionArray.Push(SpawnPosition);
+		}
+
+	}
+	return SpawnPositionArray;
 }
 
 // Set the location of the nav mesh to the location of the tile it will be covering.

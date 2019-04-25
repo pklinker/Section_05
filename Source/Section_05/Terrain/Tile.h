@@ -7,6 +7,16 @@
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Tile.generated.h"
 
+USTRUCT()
+struct FSpawnPosition
+{
+	GENERATED_USTRUCT_BODY()
+	
+	FVector Location;
+	float YawRotation;
+	float Scale;
+};
+
 class UActorPool;
 UCLASS()
 class SECTION_05_API ATile : public AActor
@@ -22,7 +32,8 @@ public:
 		void PlaceGrass(int NumberOfGrassTextures, bool RandomQuantity);
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 		void SetNavVolumeActorPool(UActorPool *InPool);
-
+	//UFUNCTION(BlueprintCallable, Category = "Setup")
+		TArray<FSpawnPosition> SpawnPositions(int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale, float MaximumScale);
 	void PositionNavMeshBoundsVolume();
 
 protected:
@@ -46,7 +57,7 @@ public:
 private:
 	bool CastSphere(FVector Location, float Radius);
 	bool GetEmptySpawnPoint(FVector &SpawnPoint, float Radius);
-	void PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float YawRotation, float Scale);
+	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition);
 	void SpawnGrass(FTransform initialTransform, uint32 actorId);
 	TMap<uint32, uint32> IdToInstanceMapping;
 	UActorPool *NavMeshVolumeActorPool;
