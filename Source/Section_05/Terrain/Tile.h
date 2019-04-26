@@ -7,14 +7,33 @@
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Tile.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FSpawnPosition
 {
 	GENERATED_USTRUCT_BODY()
-	
-	FVector Location;
-	float YawRotation;
-	float Scale;
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Position")
+		FVector Location; // make these uproperties to be available in blueprint
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Position")
+		float YawRotation;
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Position")
+		float Scale;
+};
+
+USTRUCT(BlueprintType)
+struct FSpawnRandomizers
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Randomizer")
+		int MinSpawnedActors; 
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Randomizer")
+		int MaxSpawnedActors;
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Randomizer")
+		float Radius;
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Randomizer")
+		float MinimumScale = 1.0;
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Randomizer")
+		float MaximumScale = 1.0;
 };
 
 class UActorPool;
@@ -27,13 +46,15 @@ public:
 	// Sets default values for this actor's properties
 	ATile();
 	UFUNCTION(BlueprintCallable, Category="Setup")
-		void  PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale = 1.0, float MaximumScale = 1.0);
+		void  PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnRandomizers SpawnRandomizers);
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+		void  PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FSpawnRandomizers SpawnRandomizers);
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 		void PlaceGrass(int NumberOfGrassTextures, bool RandomQuantity);
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 		void SetNavVolumeActorPool(UActorPool *InPool);
 	//UFUNCTION(BlueprintCallable, Category = "Setup")
-		TArray<FSpawnPosition> SpawnPositions(int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale, float MaximumScale);
+		TArray<FSpawnPosition> SpawnRandomPositions(FSpawnRandomizers SpawnRandomizers);
 	void PositionNavMeshBoundsVolume();
 
 protected:
@@ -58,6 +79,7 @@ private:
 	bool CastSphere(FVector Location, float Radius);
 	bool GetEmptySpawnPoint(FVector &SpawnPoint, float Radius);
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition);
+	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
 	void SpawnGrass(FTransform initialTransform, uint32 actorId);
 	TMap<uint32, uint32> IdToInstanceMapping;
 	UActorPool *NavMeshVolumeActorPool;

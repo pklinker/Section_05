@@ -14,6 +14,7 @@ ATile::ATile()
 	PrimaryActorTick.bCanEverTick = true;
 	NavigationBoundsOffset = FVector(2000, 0, 0);
 }
+
 void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition)
 {
 	//		const FRotator SpawnRotation = GetActorRotation();
@@ -29,9 +30,9 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition
 	SpawnedActor->SetActorScale3D(FVector(SpawnPosition.Scale, SpawnPosition.Scale, SpawnPosition.Scale));
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale, float MaximumScale)
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnRandomizers SpawnRandomizers)
 {
-	TArray<FSpawnPosition> SpawnPositionArray = SpawnPositions(MinSpawnedActors, MaxSpawnedActors, Radius, MinimumScale, MaximumScale);
+	TArray<FSpawnPosition> SpawnPositionArray = SpawnRandomPositions(SpawnRandomizers);
 
 	for (FSpawnPosition SpawnPosition:SpawnPositionArray)
 	{
@@ -39,6 +40,27 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawnedActors, int M
 			PlaceActor(ToSpawn, SpawnPosition);
 	}
 }
+
+void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FSpawnRandomizers SpawnRandomizers)
+{
+	TArray<FSpawnPosition> SpawnPositionArray = SpawnRandomPositions(SpawnRandomizers);
+	for (FSpawnPosition SpawnPosition : SpawnPositionArray)
+	{
+		PlaceAIPawn(ToSpawn, SpawnPosition);
+	}
+}
+
+void ATile::PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition)
+{
+	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(ToSpawn);
+	SpawnedPawn->SetActorRelativeLocation(SpawnPosition.Location);
+	SpawnedPawn->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+	SpawnedPawn->SetActorRotation(FRotator(0, SpawnPosition.YawRotation, 0));
+	SpawnedPawn->SpawnDefaultController(); // automatically creates AIController and attaches it to ensure Pawn in controlled.
+	SpawnedPawn->Tags.Add(FName("Enemy"));
+
+}
+
 /**
 * If RandomQuantity is true then it will use the NumberOfGrassTextures as a maximum in a random number generator
 NOT USED YET
@@ -83,25 +105,25 @@ void ATile::SetNavVolumeActorPool(UActorPool * InPool)
 	PositionNavMeshBoundsVolume();
 }
 
-TArray<FSpawnPosition> ATile::SpawnPositions(int MinSpawnedActors, int MaxSpawnedActors, float Radius, float MinimumScale, float MaximumScale)
+TArray<FSpawnPosition> ATile::SpawnRandomPositions(FSpawnRandomizers SpawnRandomizers)
 {
 	TArray<FSpawnPosition> SpawnPositionArray;
 	// set a minimum of 1 to prevent weirdness
-	if (MinSpawnedActors < 0)
+	if (SpawnRandomizers.MinSpawnedActors < 0)
 	{
-		MinSpawnedActors = 0;
+		SpawnRandomizers.MinSpawnedActors = 0;
 	}
 	// verify max is greater than min. If not, set max to min+1
-	if (MaxSpawnedActors <= MinSpawnedActors)
+	if (SpawnRandomizers.MaxSpawnedActors <= SpawnRandomizers.MinSpawnedActors)
 	{
-		MaxSpawnedActors = MinSpawnedActors + 1;
+		SpawnRandomizers.MaxSpawnedActors = SpawnRandomizers.MinSpawnedActors + 1;
 	}
-	int NumActorsToSpawn = FMath::RandRange(MinSpawnedActors, MaxSpawnedActors);
+	int NumActorsToSpawn = FMath::RandRange(SpawnRandomizers.MinSpawnedActors, SpawnRandomizers.MaxSpawnedActors);
 	//UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i actors =======================================."), NumActorsToSpawn);
 	for (size_t i = 0; i < NumActorsToSpawn; i++) {
 		FSpawnPosition SpawnPosition;
-		SpawnPosition.Scale = FMath::RandRange(MinimumScale, MaximumScale);
-		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPosition.Location, Radius*SpawnPosition.Scale);
+		SpawnPosition.Scale = FMath::RandRange(SpawnRandomizers.MinimumScale, SpawnRandomizers.MaximumScale);
+		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPosition.Location, SpawnRandomizers.Radius*SpawnPosition.Scale);
 		if (SpawnPointFound)
 		{
 			SpawnPosition.YawRotation = FMath::RandRange(-180.f, 180.f);		
