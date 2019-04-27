@@ -79,9 +79,14 @@ private:
 	bool CastSphere(FVector Location, float Radius);
 	bool GetEmptySpawnPoint(FVector &SpawnPoint, float Radius);
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition);
-	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
+	void PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
 	void SpawnGrass(FTransform initialTransform, uint32 actorId);
+	template <class T>
+	void RandomlyPlaceActors(TSubclassOf<T> ToSpawn, FSpawnRandomizers SpawnRandomizers);
+
 	TMap<uint32, uint32> IdToInstanceMapping;
 	UActorPool *NavMeshVolumeActorPool;
 	AActor *NavMeshVolumeActor;
 };
+
+

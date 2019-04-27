@@ -15,6 +15,58 @@ ATile::ATile()
 	NavigationBoundsOffset = FVector(2000, 0, 0);
 }
 
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnRandomizers SpawnRandomizers)
+{
+	RandomlyPlaceActors(ToSpawn, SpawnRandomizers);
+}
+
+void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FSpawnRandomizers SpawnRandomizers)
+{
+	RandomlyPlaceActors(ToSpawn, SpawnRandomizers);
+}
+
+template<class T>
+void ATile::RandomlyPlaceActors(TSubclassOf<T> ToSpawn, FSpawnRandomizers SpawnRandomizers)
+{
+	// set a minimum of 1 to prevent weirdness
+	if (SpawnRandomizers.MinSpawnedActors < 0)
+	{
+		SpawnRandomizers.MinSpawnedActors = 0;
+	}
+	// verify max is greater than min. If not, set max to min+1
+	if (SpawnRandomizers.MaxSpawnedActors <= SpawnRandomizers.MinSpawnedActors)
+	{
+		SpawnRandomizers.MaxSpawnedActors = SpawnRandomizers.MinSpawnedActors + 1;
+	}
+	int NumActorsToSpawn = FMath::RandRange(SpawnRandomizers.MinSpawnedActors, SpawnRandomizers.MaxSpawnedActors);
+	//UE_LOG(LogTemp, Warning, TEXT("=======================Spawning %i actors =======================================."), NumActorsToSpawn);
+	for (size_t i = 0; i < NumActorsToSpawn; i++) {
+		FSpawnPosition SpawnPosition;
+		SpawnPosition.Scale = FMath::RandRange(SpawnRandomizers.MinimumScale, SpawnRandomizers.MaximumScale);
+		bool SpawnPointFound = GetEmptySpawnPoint(SpawnPosition.Location, SpawnRandomizers.Radius*SpawnPosition.Scale);
+		if (SpawnPointFound)
+		{
+			SpawnPosition.YawRotation = FMath::RandRange(-180.f, 180.f);
+			PlaceActor(ToSpawn, SpawnPosition);
+		}
+
+	}
+}
+void ATile::PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition)
+{
+	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(ToSpawn);
+	if (SpawnedPawn == nullptr)
+	{
+		return;
+	}
+	SpawnedPawn->SetActorRelativeLocation(SpawnPosition.Location);
+	SpawnedPawn->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+	SpawnedPawn->SetActorRotation(FRotator(0, SpawnPosition.YawRotation, 0));
+	SpawnedPawn->SpawnDefaultController(); // automatically creates AIController and attaches it to ensure Pawn in controlled.
+	SpawnedPawn->Tags.Add(FName("Enemy"));
+
+}
+
 void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition)
 {
 	//		const FRotator SpawnRotation = GetActorRotation();
@@ -24,42 +76,16 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition
 	//		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(*ToSpawn, SpawnPoint, SpawnRotation,ActorSpawnParams);
 	AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ToSpawn);
 	//UE_LOG(LogTemp, Warning, TEXT("Random point: %s spawned actor %s."), *SpawnPoint.ToString(), *SpawnedActor->GetFName().ToString());
+	if (SpawnedActor == nullptr)
+	{
+		return;
+	}
 	SpawnedActor->SetActorRelativeLocation(SpawnPosition.Location);
 	SpawnedActor->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	SpawnedActor->SetActorRotation(FRotator(0, SpawnPosition.YawRotation, 0));
 	SpawnedActor->SetActorScale3D(FVector(SpawnPosition.Scale, SpawnPosition.Scale, SpawnPosition.Scale));
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnRandomizers SpawnRandomizers)
-{
-	TArray<FSpawnPosition> SpawnPositionArray = SpawnRandomPositions(SpawnRandomizers);
-
-	for (FSpawnPosition SpawnPosition:SpawnPositionArray)
-	{
-			
-			PlaceActor(ToSpawn, SpawnPosition);
-	}
-}
-
-void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FSpawnRandomizers SpawnRandomizers)
-{
-	TArray<FSpawnPosition> SpawnPositionArray = SpawnRandomPositions(SpawnRandomizers);
-	for (FSpawnPosition SpawnPosition : SpawnPositionArray)
-	{
-		PlaceAIPawn(ToSpawn, SpawnPosition);
-	}
-}
-
-void ATile::PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition)
-{
-	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(ToSpawn);
-	SpawnedPawn->SetActorRelativeLocation(SpawnPosition.Location);
-	SpawnedPawn->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-	SpawnedPawn->SetActorRotation(FRotator(0, SpawnPosition.YawRotation, 0));
-	SpawnedPawn->SpawnDefaultController(); // automatically creates AIController and attaches it to ensure Pawn in controlled.
-	SpawnedPawn->Tags.Add(FName("Enemy"));
-
-}
 
 /**
 * If RandomQuantity is true then it will use the NumberOfGrassTextures as a maximum in a random number generator
